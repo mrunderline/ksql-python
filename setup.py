@@ -21,7 +21,7 @@ def get_install_requirements(path):
     ]
 
 # Get version from __init__.py file
-VERSION = "0.10.2"
+VERSION = "0.10.3"
 
 here = os.path.dirname(__file__)
 
@@ -33,7 +33,6 @@ setuptools_kwargs = {
 	    'requests',
 		'six',
 		'urllib3',
-        'hyper'
     ],
     'zip_safe': False,
 }
@@ -68,6 +67,8 @@ setup(
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
         "Topic :: Software Development :: Libraries :: Python Modules"
     ],
     **setuptools_kwargs
