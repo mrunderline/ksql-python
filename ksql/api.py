@@ -9,7 +9,7 @@ import urllib
 from copy import deepcopy
 from requests import Timeout
 from urllib.parse import urlparse
-from hyper import HTTPConnection
+from http.client import HTTPConnection
 
 
 from ksql.builder import SQLBuilder
