@@ -9,7 +9,7 @@ import urllib
 from copy import deepcopy
 from requests import Timeout
 from urllib.parse import urlparse
-from http.client import HTTPConnection
+from httpx import Client
 
 
 from ksql.builder import SQLBuilder
@@ -84,7 +84,7 @@ class BaseAPI(object):
         else:
             body["properties"] = {}
 
-        with HTTPConnection(parsed_uri.netloc) as connection:
+        with Client(http2=True) as connection:
             streaming_response = self._request2(
                 endpoint="query-stream", body=body, connection=connection
             )
@@ -144,9 +144,7 @@ class BaseAPI(object):
             base64string = base64.b64encode(bytes("{}:{}".format(self.api_key, self.secret), "utf-8")).decode("utf-8")
             headers["Authorization"] = "Basic %s" % base64string
 
-        connection.request(method=method.upper(), url=url, headers=headers, body=data)
-        resp = connection.get_response()
-
+        resp = connection.request(method=method.upper(), url=url, headers=headers, body=data)
         return resp
 
     def _request(self, endpoint, method="POST", sql_string="", stream_properties=None, encoding="utf-8"):
@@ -207,9 +205,8 @@ class BaseAPI(object):
         parsed_uri = urlparse(self.url)
         url = "{}/{}".format(self.url, "inserts-stream")
         headers = deepcopy(self.headers)
-        with HTTPConnection(parsed_uri.netloc) as connection:
-            connection.request("POST", url, bytes(body, "utf-8"), headers)
-            response = connection.get_response()
+        with Client(http2=True) as connection:
+            response = connection.request(method="POST", url=url, content=bytes(body, "utf-8"), headers=headers)
             result = response.read()
 
         result_str = result.decode("utf-8")

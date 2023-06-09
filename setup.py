@@ -33,6 +33,7 @@ setuptools_kwargs = {
 	    'requests',
 		'six',
 		'urllib3',
+        'httpx[http2]',
     ],
     'zip_safe': False,
 }
