@@ -84,7 +84,7 @@ class BaseAPI(object):
         else:
             body["properties"] = {}
 
-        with Client(http2=True) as connection:
+        with Client(http1=False, http2=True) as connection:
             streaming_response = self._request2(
                 endpoint="query-stream", body=body, connection=connection
             )
@@ -205,7 +205,7 @@ class BaseAPI(object):
         parsed_uri = urlparse(self.url)
         url = "{}/{}".format(self.url, "inserts-stream")
         headers = deepcopy(self.headers)
-        with Client(http2=True) as connection:
+        with Client(http1=False, http2=True) as connection:
             response = connection.request(method="POST", url=url, content=bytes(body, "utf-8"), headers=headers)
             result = response.read()
 
