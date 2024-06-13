@@ -1,16 +1,15 @@
 import time
-
-import base64
-import functools
 import json
+import base64
 import logging
-import requests
-import urllib
+import functools
 from copy import deepcopy
+
+import httpx
+import urllib
+import requests
 from requests import Timeout
 from urllib.parse import urlparse
-from httpx import Client
-
 
 from ksql.builder import SQLBuilder
 from ksql.errors import CreateError, InvalidQueryError, KSQLError
@@ -84,7 +83,7 @@ class BaseAPI(object):
         else:
             body["properties"] = {}
 
-        with Client(http1=False, http2=True) as connection:
+        with httpx.Client(http1=False, http2=True) as connection:
             streaming_response = self._request2(
                 endpoint="query-stream", body=body, connection=connection
             )
@@ -205,7 +204,7 @@ class BaseAPI(object):
         parsed_uri = urlparse(self.url)
         url = "{}/{}".format(self.url, "inserts-stream")
         headers = deepcopy(self.headers)
-        with Client(http1=False, http2=True) as connection:
+        with httpx.Client(http1=False, http2=True) as connection:
             response = connection.request(method="POST", url=url, content=bytes(body, "utf-8"), headers=headers)
             result = response.read()
 
@@ -220,7 +219,7 @@ class BaseAPI(object):
 
         return return_arr
 
-    @ staticmethod
+    @staticmethod
     def retry(exceptions, delay=1, max_retries=5):
         """
         A decorator for retrying a function call with a specified delay in case of a set of exceptions
@@ -235,7 +234,7 @@ class BaseAPI(object):
         """
 
         def outer_wrapper(function):
-            @ functools.wraps(function)
+            @functools.wraps(function)
             def inner_wrapper(*args, **kwargs):
                 final_excep = None
                 for counter in range(max_retries):
@@ -245,7 +244,7 @@ class BaseAPI(object):
                     try:
                         value = function(*args, **kwargs)
                         return value
-                    except (exceptions) as e:
+                    except exceptions as e:
                         final_excep = e
                         pass  # or log it
 
